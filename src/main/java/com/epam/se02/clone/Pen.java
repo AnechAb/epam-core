@@ -63,8 +63,22 @@ public class Pen implements Cloneable{
 
 class PencilCase implements Cloneable{
 
-    private Pen[] pens = new Pen[10];
+    private static int numberCreatedPencilCases = 0;
+    private final Pen[] pens = new Pen[10];
     private int cursor = 0;
+
+    public PencilCase(PencilCase other) {
+        ++numberCreatedPencilCases;
+        for (Pen pen : other.pens) {
+            if (pen != null) {
+                add(pen.clone());
+            }
+        }
+    }
+
+    public PencilCase() {
+
+    }
 
     public void add(Pen pen){
         pens[cursor] = pen;
@@ -75,22 +89,22 @@ class PencilCase implements Cloneable{
         return pens;
     }
 
-    @Override
-    protected PencilCase clone(){
-        try {
-            PencilCase clone = (PencilCase) super.clone();
-            Pen[] copyPens = Arrays.copyOf(this.pens, this.pens.length);
-            for (int i = 0; i < copyPens.length; i++) {
-                if (copyPens[i] != null) {
-                    copyPens[i] = copyPens[i].clone();
-                }
-            }
-            clone.pens = copyPens;
-            return clone;
-        } catch (CloneNotSupportedException ignore) {
-            throw new RuntimeException(ignore);
-        }
-    }
+//    @Override
+//    protected PencilCase clone(){
+//        try {
+//            PencilCase clone = (PencilCase) super.clone();
+//            Pen[] copyPens = Arrays.copyOf(this.pens, this.pens.length);
+//            for (int i = 0; i < copyPens.length; i++) {
+//                if (copyPens[i] != null) {
+//                    copyPens[i] = copyPens[i].clone();
+//                }
+//            }
+//            clone.pens = copyPens;
+//            return clone;
+//        } catch (CloneNotSupportedException ignore) {
+//            throw new RuntimeException(ignore);
+//        }
+//    }
 }
 
 class Launcher {
@@ -104,7 +118,7 @@ class Launcher {
 
         pCase.add(bic);
 
-        PencilCase clone = pCase.clone();
+        PencilCase clone = new PencilCase(pCase);
 
         System.out.println(pCase.getPens() == clone.getPens());
         clone.getPens()[0].setPrice(11);
