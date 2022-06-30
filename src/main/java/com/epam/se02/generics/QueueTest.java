@@ -16,7 +16,7 @@ public class QueueTest {
     }
 
     private static void test1() {
-        Queue queue = new ArrayQueue();
+        Queue<String> queue = new ArrayQueue<>();
 
         assert queue.isEmpty();
 
@@ -25,10 +25,10 @@ public class QueueTest {
     }
 
     private static void test2() {
-        Queue queue = new ArrayQueue();
+        Queue<String> queue = new ArrayQueue<>();
 
         try {
-            queue.peek();
+            String value = queue.peek();
             assert false;
         } catch (Exception ex){
             assert ex instanceof NoSuchElementException;
@@ -54,7 +54,7 @@ public class QueueTest {
 
     private static void test4() {
         // prepare
-        Queue queue = new ArrayQueue();
+        Queue<Integer> queue = new ArrayQueue<>();
 
         //run
         int value = 1;
@@ -70,7 +70,7 @@ public class QueueTest {
     }
 
     private static void test5() {
-        Queue queue = new ArrayQueue();
+        Queue<Integer> queue = new ArrayQueue<>();
 
         int value = 1;
         queue.put(value);
@@ -83,7 +83,7 @@ public class QueueTest {
     }
 
     private static void test6() {
-        Queue queue = new ArrayQueue();
+        Queue<Integer> queue = new ArrayQueue<>();
 
         int value1 = 1;
         int value2 = 2;
@@ -101,7 +101,7 @@ public class QueueTest {
     }
 
     private static void test7() {
-        Queue queue = new ArrayQueue();
+        Queue<String> queue = new ArrayQueue<>();
 
         String str = "123";
         queue.put(str);
@@ -115,7 +115,7 @@ public class QueueTest {
     }
 
     private static void test8() {
-        Queue stringQueue = new ArrayQueue();
+        Queue<String> stringQueue = new ArrayQueue<>();
 
         String str = "123";
         stringQueue.put(str);
@@ -131,8 +131,36 @@ public class QueueTest {
 
     }
 
-    private static void devilMethod(Queue queue) {
+    private static void test9() {
+        Queue<String> stringQueue = new ArrayQueue<>();
+
+        isEmpty(stringQueue);
+
+        Queue<Integer> intQueue = new ArrayQueue<>();
+
+        isEmpty(intQueue);
+
+        System.out.println("Test9 passed");
+
+    }
+
+    private static void devilMethod(Queue<String> queue) {
         queue.poll();
-        queue.put(1);
+//        queue.put(1);
+    }
+
+
+    private static boolean isEmpty(Queue<?> queue) {
+
+//        queue.put("123");
+//        queue.put(1);
+//        queue.put(new Thread());
+//        queue.put(new Object);
+
+        queue.put(null);
+
+        Object poll = queue.poll();
+
+        return queue.isEmpty();
     }
 }
