@@ -1,5 +1,6 @@
 package com.epam.se02.generics;
 
+import java.util.Comparator;
 import java.util.NoSuchElementException;
 
 public class QueueTest {
@@ -12,7 +13,8 @@ public class QueueTest {
         test5();
         test6();
         test7();
-        test8();
+        test10();
+//        test8();
     }
 
     private static void test1() {
@@ -162,5 +164,51 @@ public class QueueTest {
         Object poll = queue.poll();
 
         return queue.isEmpty();
+    }
+
+    private static void test10() {
+        Queue<String> stringQueue = new ArrayQueue<>();
+        stringQueue.put("1");
+        stringQueue.put("12");
+        stringQueue.put("023");
+
+        String max = max(stringQueue);
+
+        assert max.equals("023"); // AssertionError
+
+        System.out.println("Test10 passed");
+
+    }
+
+    private static <T> T max(Queue<T> queue, Comparator<T> comparator){
+        T result = queue.poll();
+
+        while (!queue.isEmpty()){
+            T curr = queue.poll();
+            if (comparator.compare(result, curr) < 0) {
+                result = curr;
+            }
+        }
+        return result;
+    }
+
+    private static <T extends Comparable<T>> T max(Queue<T> queue){
+        T result = queue.poll();
+
+        while (!queue.isEmpty()){
+            T curr = queue.poll();
+            if (result.compareTo(curr) < 0) {
+                result = curr;
+            }
+        }
+        return result;
+    }
+}
+
+class StringByLengthComparator implements Comparator<String> {
+
+    @Override
+    public int compare(String o1, String o2) {
+        return Integer.compare(o1.length(), o2.length());
     }
 }
