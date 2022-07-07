@@ -1,6 +1,7 @@
 package com.epam.se02.generics;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class ArrayQueue<E> implements Queue<E> {
@@ -50,5 +51,10 @@ public class ArrayQueue<E> implements Queue<E> {
     @Override
     public boolean isEmpty() {
         return indexPoll == indexPut;
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        throw new UnsupportedOperationException();
     }
 }
