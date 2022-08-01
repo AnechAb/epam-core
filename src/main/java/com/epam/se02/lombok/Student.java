@@ -1,10 +1,10 @@
 package com.epam.se02.lombok;
 
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Value;
+import lombok.*;
 
+@Getter
+@Setter
 @EqualsAndHashCode(exclude = {"name", "surname", "age"})
 @AllArgsConstructor
 public class Student {
