@@ -25,7 +25,7 @@ class IntSummatorTest {
 
         Integer result = summator.twice(1);
 
-        assertEquals(3, result.intValue());
+        assertEquals(2, result.intValue());
 //        throw new UnsupportedOperationException();
     }
 }

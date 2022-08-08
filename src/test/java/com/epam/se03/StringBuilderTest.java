@@ -27,8 +27,8 @@ public class StringBuilderTest {
 //        builder.append("123");
         builder.setLength(0);
         builder.trimToSize();
-        assertEquals(3, builder.length());
-        assertEquals(3, builder.capacity());
+        assertEquals(0, builder.length());
+        assertEquals(0, builder.capacity());
     }
 
     @Test
