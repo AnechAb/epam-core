@@ -33,7 +33,7 @@ public class SerializationExample {
             System.out.println(objSave.equals(deserializedObject));
 
             // проверяем идентичность объектов
-            System.out.println("readed object is: " + objRead.toString());
+            System.out.println("read object is: " + objRead.toString());
             System.out.println("Object equality is: "
                     + (objSave.equals(objRead)));
             System.out
