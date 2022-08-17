@@ -6,40 +6,37 @@ public class FinallyUsage {
         try {
             procA();
         } catch (Exception e) {
-            System.out.println("Исключение выброшено");
+            System.out.println("Exception thrown");
         }
         System.out.println(procB());
         System.out.println(procC());
     }
 
-    // Выход из метода через исключение
     static void procA() {
         try {
-            System.out.println("Внутри procA");
+            System.out.println("Inside procA");
             if (true) {
                 throw new RuntimeException("demo");
             }
         } finally {
-            System.out.println("finally для procA ");
+            System.out.println("finally for procA ");
         }
         System.out.println("procA::after try");
     }
-    // Возврат изнутри try-блока
 
     static int procB() {
         try {
-            System.out.println("Внутри procB");
+            System.out.println("Inside procB");
             return 10;
         } finally {
-            System.out.println("finally для procB ");
+            System.out.println("finally for procB ");
             return 20;
         }
     }
 
-    // Нормальное выполнение try-блока
     static int procC() {
         try {
-            System.out.println("Внутри procC");
+            System.out.println("Inside procC");
             throw new RuntimeException("demo");
         } catch (RuntimeException ex) {
             return 50;
