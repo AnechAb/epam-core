@@ -4,11 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.*;
 
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -95,6 +100,27 @@ public class MapTest {
         map.put(a1, "value");
         assertNotNull(map.get(a1));
         assertNull(map.get(a2));
+    }
+
+    @Test
+    void containsEntryWithCondition() {
+        Map<String, Integer> source = new HashMap<>();
+
+        source.put("World1", 80);
+        source.put("Hello1", 42);
+        source.put("Hello2", 73);
+
+        assertThat(source, hasEntry(startsWith("Hello"), greaterThan(50)));
+
+//        boolean entryFound = false;
+//        for (Map.Entry<String, Integer> entry : source.entrySet()) {
+//            if (entry.getKey().startsWith("Hello") && entry.getValue() > 50){
+//                entryFound = true;
+//                break;
+//            }
+//        }
+//        assertTrue(entryFound);
+
     }
 }
 
