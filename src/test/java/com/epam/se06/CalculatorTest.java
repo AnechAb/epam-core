@@ -1,11 +1,18 @@
 package com.epam.se06;
 
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
+import org.junit.jupiter.params.provider.CsvSource;
+
+import java.time.Duration;
 
 import static org.hamcrest.Matchers.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CalculatorTest {
@@ -14,14 +21,14 @@ class CalculatorTest {
 
     @BeforeAll
     static void createCalculator() {
-        calculator = null;
+        calculator = new SimpleCalculator();
     }
 
     @Nested
     class PositiveTests {
 
         @Nested
-        class SumMethodTests {
+        class SumMethod {
 
             @Test
             void sumOverflowShouldWorkCorrectly() {
@@ -70,7 +77,7 @@ class CalculatorTest {
         }
 
         @Nested
-        class SubtractMethodTests {
+        class SubtractMethod {
             @Test
             void subtractZeroShouldResultSameValue() {
                 int original = 42;
@@ -178,13 +185,147 @@ class CalculatorTest {
                 assertThat(result, is(Integer.MIN_VALUE));
             }
         }
+
+        @Nested
+        class DivideMethod {
+
+            @Test
+            void divideTwoPositiveValuesShouldProducePositiveValue() {
+                double result = calculator.divide(10, 5);
+
+                assertThat(result, is(2.0));
+            }
+
+            @Test
+            void dividePositiveValueByNegativeShouldProduceNegativeValue() {
+                double result = calculator.divide(10, -5);
+
+                assertThat(result, is(-2.0));
+            }
+
+            @Test
+            void divideNegativeValueByPositiveShouldProduceNegativeValue() {
+                double result = calculator.divide(-10, 5);
+
+                assertThat(result, is(-2.0));
+            }
+
+            @Test
+            void divideTwoNegativeValuesShouldProducePositiveValue() {
+                double result = calculator.divide(-10, -5);
+
+                assertThat(result, is(2.0));
+            }
+
+            @Test
+            void divideValuesWithPeriodInResult() {
+                double result = calculator.divide(10, 3);
+
+                assertThat(result, closeTo(3.333, 0.001));
+            }
+        }
+
+        @Nested
+        class RootMethod {
+
+            @Test
+            void rootFromZeroValueShouldBeZero() {
+                double result = calculator.root(0, 2);
+
+                assertThat(result, closeTo(0, 0.001));
+            }
+
+            @Test
+            void rootFromPositiveValue() {
+                double result = calculator.root(100, 2);
+
+                assertThat(result, closeTo(10, 0.001));
+            }
+        }
+
+        @Nested
+        class PowerMethod {
+
+            @Test
+            void powerToZeroShouldProduceZero() {
+                int result = calculator.power(42, 0);
+
+                assertThat(result, is(1));
+            }
+
+            @Test
+            void powerToOneShouldProduceSameValue() {
+                int original = 10;
+
+                int result = calculator.power(original, 1);
+
+                assertThat(result, is(original));
+            }
+
+            @Test
+            void powerToSquare() {
+                int result = calculator.power(10, 2);
+
+                assertThat(result, is(100));
+            }
+        }
+
+        @ParameterizedTest(name = "Check value {0} for prime - should be {1}")
+        @CsvFileSource(resources = "prime_values.csv", numLinesToSkip = 1)
+        void checkFirst10PrimeValues(int value, boolean isPrime) {
+            assertThat(calculator.isPrime(value), is(isPrime));
+        }
+
+        @ParameterizedTest(name = "Check that {0}-th Fibonacci value is {1}")
+        @CsvSource({"0,0", "1,1", "2,1", "3,2", "4,3", "5,5", "6,8", "7,13", "8,21", "9,34"})
+        void checkFirst10FibonacciValues(int index, int fibonacciValue) {
+            assertThat(calculator.getFibonacci(index), is(fibonacciValue));
+        }
     }
 
     @Nested
     class NegativeTests {
         @Test
-        void name() {
-            assertThat(true, is(false));
+        void divideByZeroShouldThrowException() {
+            assertThrows(IllegalArgumentException.class, () -> calculator.divide(10, 0));
+        }
+
+        @Test
+        void extractingZeroRootShouldThrowException() {
+            assertThrows(IllegalArgumentException.class, () -> calculator.root(10, 0));
+        }
+
+        @Test
+        void negativePowerShouldThrowException() {
+            assertThrows(IllegalArgumentException.class, () -> calculator.power(10, -1));
+        }
+    }
+
+    @Nested
+    class IsPrimeMethod {
+
+        @Test
+        void negativeValueNotPrime() {
+            assertThat(calculator.isPrime(-1), is(false));
+        }
+
+        @Test
+        void zeroIsNotPrimeValue() {
+            assertThat(calculator.isPrime(0), is(false));
+        }
+
+        @Test
+        void oneIsNotPrimeValue() {
+            assertThat(calculator.isPrime(1), is(false));
+        }
+
+        @Test
+        void checkTimeoutCalculatingPrimeValue() {
+            boolean isPrime = calculator.isPrime(999_983);
+
+            Executable task = () -> assertThat(isPrime, is(true));
+
+            assertTimeoutPreemptively(Duration.ofMillis(10), task);
         }
     }
 }
