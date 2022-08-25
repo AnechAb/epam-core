@@ -4,10 +4,16 @@ import lombok.Value;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.IntFunction;
+import java.util.function.ToIntBiFunction;
+import java.util.function.ToIntFunction;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 class StreamTest {
 
@@ -22,7 +28,7 @@ class StreamTest {
     void name() {
         long countIvans = employees.stream()
                                    .map(Employee::getPerson)
-                                   .filter(person -> person.getFirstName().equals("Иван"))
+                                   .filter(person -> person.getFirstName().equals("РРІР°РЅ"))
                                    .peek(System.out::println)
                                    .count();
 
@@ -32,7 +38,7 @@ class StreamTest {
 //        int countIvans = 0;
 //        for (Employee employee : employees) {
 //            Person person = employee.getPerson();
-//            if (person.getFirstName().equals("Иван")) {
+//            if (person.getFirstName().equals("РРІР°РЅ")) {
 //                System.out.println(person.getFullName());
 //                ++countIvans;
 //            }
@@ -40,41 +46,114 @@ class StreamTest {
 //        System.out.println(countIvans);
     }
 
+    @Test
+    void name1() {
+        Stream<Employee> stream1 = employees.stream();
+        Stream<Employee> stream2 = stream1.filter(employee -> !employee.getJobHistory().isEmpty());
+        Stream<Employee> stream3 = stream2.filter(employee -> employee.getJobHistory()
+                                                                      .get(0)
+                                                                      .getEmployer()
+                                                                      .equals("EPAM"));
+        assertThat(stream1, is(not(sameInstance(stream2))));
+        assertThat(stream2, is(not(sameInstance(stream3))));
+        stream3.forEach(System.out::println);
+    }
+
+    @Test
+    void name2() {
+        Function<String, Integer> extractLengthFromString = String::length;
+        Integer length1 = extractLengthFromString.apply("123");
+        Integer length2 = extractLengthFromString.apply("123456");
+
+        ToIntFunction<String> extractLengthFromString2 = String::length;
+        IntFunction<String> convertIntToString = String::valueOf;
+
+        IntFunction<Person[]> generator = Person[]::new;
+
+        Person[] arr1 = generator.apply(10);
+        assertThat(arr1, arrayWithSize(10));
+        Person[] arr2 = generator.apply(10);
+        assertThat(arr1, arrayWithSize(10));
+        assertThat(arr1, is(not(sameInstance(arr2))));
+
+        Person[] arr3 = generator.apply(20);
+        assertThat(arr1, arrayWithSize(20));
+
+        Person[] people = employees.stream()
+                                   .map(Employee::getPerson)
+                                   .filter(person -> person.getAge() > 25)
+                                   .toArray(Person[]::new);
+
+        assertThat(people, arrayWithSize(5));
+    }
+
+    @Test
+    void name3() {
+        Set<String> result = Stream.of(10, 2, 3000, 4, 4, 5)
+                                   .sorted()
+                                   .map(String::valueOf)
+                                   .filter(str -> str.length() < 4)
+                                   .collect(Collectors.toSet());
+        assertThat(result, containsInAnyOrder("10", "2", "4", "5"));
+    }
+
+    @Test
+    void name4() {
+        String[] strings = {"1", "2", "3"};
+        assertThat(Stream.of(strings).count(), is(3L));
+    }
+
+    @Test
+    void name5() {
+        Random random = new Random();
+        boolean result = Stream.generate(() -> random.nextInt(100))
+                          .peek(System.out::println)
+                          .filter(value -> value > 49)
+                          .allMatch(value -> value < 90);
+
+        assertThat(result, is(false));
+
+    }
+
+    @Test
+    void name6() {
+    }
+
     private static List<Employee> getEmployees() {
         return Arrays.asList(
                 new Employee(
-                        new Person("Иван", "Мельников", 30),
+                        new Person("РРІР°РЅ", "РњРµР»СЊРЅРёРєРѕРІ", 30),
                         Arrays.asList(
                                 new JobHistoryEntry(2, "dev", "EPAM"),
                                 new JobHistoryEntry(1, "dev", "google")
                         )),
                 new Employee(
-                        new Person("Александр", "Дементьев", 28),
+                        new Person("РђР»РµРєСЃР°РЅРґСЂ", "Р”РµРјРµРЅС‚СЊРµРІ", 28),
                         Arrays.asList(
                                 new JobHistoryEntry(1, "tester", "EPAM"),
                                 new JobHistoryEntry(1, "dev", "EPAM"),
                                 new JobHistoryEntry(1, "dev", "google")
                         )),
                 new Employee(
-                        new Person("Дмитрий", "Осинов", 40),
+                        new Person("Р”РјРёС‚СЂРёР№", "РћСЃРёРЅРѕРІ", 40),
                         Arrays.asList(
                                 new JobHistoryEntry(3, "QA", "yandex"),
                                 new JobHistoryEntry(1, "QA", "mail.ru"),
                                 new JobHistoryEntry(1, "dev", "mail.ru")
                         )),
                 new Employee(
-                        new Person("Анна", "Светличная", 21),
+                        new Person("РђРЅРЅР°", "РЎРІРµС‚Р»РёС‡РЅР°СЏ", 21),
                         Collections.singletonList(
                                 new JobHistoryEntry(1, "tester", "T-Systems")
                         )),
                 new Employee(
-                        new Person("Игорь", "Толмачёв", 50),
+                        new Person("РРіРѕСЂСЊ", "РўРѕР»РјР°С‡С‘РІ", 50),
                         Arrays.asList(
                                 new JobHistoryEntry(5, "tester", "EPAM"),
                                 new JobHistoryEntry(6, "QA", "EPAM")
                         )),
                 new Employee(
-                        new Person("Иван", "Александров", 33),
+                        new Person("РРІР°РЅ", "РђР»РµРєСЃР°РЅРґСЂРѕРІ", 33),
                         Arrays.asList(
                                 new JobHistoryEntry(2, "QA", "T-Systems"),
                                 new JobHistoryEntry(3, "QA", "EPAM"),
@@ -100,8 +179,8 @@ class Person {
 class JobHistoryEntry {
 
     int duration;
-    String employer;
     String position;
+    String employer;
 }
 
 @Value

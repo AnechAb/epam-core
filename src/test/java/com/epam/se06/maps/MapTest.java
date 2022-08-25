@@ -7,17 +7,18 @@ import lombok.ToString;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- *
  * O(1) ~ (n)   put(K, V)
  * O(1) ~ (n)   get(Object)
  * O(1) ~ (n)   remove(Object)
@@ -77,7 +78,7 @@ public class MapTest {
     }
 
     @Test
-    void treeMap(){
+    void treeMap() {
 
         TreeMap<A, Integer> map = new TreeMap<>(Comparator.comparing(A::getStr));
         map.put(new A(3, "c"), 3);
@@ -95,7 +96,7 @@ public class MapTest {
         A a1 = new A(1, "a");
         A a2 = new A(1, "a");
         assertNotSame(a1, a2);
-        assertEquals(a1,a2);
+        assertEquals(a1, a2);
 
         map.put(a1, "value");
         assertNotNull(map.get(a1));
@@ -106,7 +107,7 @@ public class MapTest {
     void containsEntryWithCondition() {
         Map<String, Integer> source = new HashMap<>();
 
-        source.put("World1", 80);
+//        source.put("World1", 80);
         source.put("Hello1", 42);
         source.put("Hello2", 73);
 
@@ -122,13 +123,73 @@ public class MapTest {
 //        assertTrue(entryFound);
 
     }
+
+    @Test
+    void putIf() {
+        Map<String, Integer> map = new HashMap<>();
+        map.put("1", 1);
+        map.put("2", 2);
+
+        assertThat(map, hasEntry("1", 1));
+
+        map.putIfAbsent("1", 11);
+        assertThat(map, hasEntry("1", 1));
+
+//        if (!map.containsKey("1")){
+//            map.put("1", 11);
+//        }
+
+        map.computeIfAbsent("3", Integer::valueOf);
+        assertThat(map, hasEntry("3", 3));
+
+        map.computeIfAbsent("3", s -> Integer.valueOf(s + s));
+        assertThat(map, hasEntry("3", 3));
+
+        map.computeIfPresent("3", (key, prev) -> prev + 1);
+        assertThat(map, hasEntry("3", 4));
+
+        map.compute("4", (key, prev) -> prev == null ? 42 : 0);
+        assertThat(map, hasEntry("4", 42));
+
+        map.compute("4", (key, prev) -> prev == null ? 42 : 0);
+        assertThat(map, hasEntry("4", 0));
+
+        map.replaceAll((key, value) -> -value);
+        assertThat(map, both(hasEntry("1", -1)).and(hasEntry("3", -4)));
+
+        map.forEach((string, value) -> System.out.println(string + " " + value));
+
+        Integer val = map.getOrDefault("195", 195);
+        assertThat(val, is(195));
+    }
+
+    @Test
+    void mergeMaps() {
+        Map<String, Integer> map1 = new HashMap<>();
+        map1.put("1", 1);
+        map1.put("2", 2);
+
+
+        Map<String, Integer> map2 = new HashMap<>();
+        map1.put("1", 1);
+        map2.put("3", 3);
+        map2.put("4", 4);
+
+        Map<String, Integer> map3 = new HashMap<>(map2);
+        map1.forEach((key, value) -> map3.merge(key, value, Integer::sum));
+
+//        map1.forEach((key1, value) -> map3.compute(key1, (key, prev) -> value + (prev == null ? 0 : prev)));
+
+
+
+    }
 }
 
 @ToString
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode
-class A implements Comparable<A>{
+class A implements Comparable<A> {
     int field;
     String str;
 
