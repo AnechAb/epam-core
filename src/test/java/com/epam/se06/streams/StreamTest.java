@@ -5,13 +5,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.function.IntFunction;
-import java.util.function.ToIntBiFunction;
-import java.util.function.ToIntFunction;
+import java.util.function.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -77,7 +76,7 @@ class StreamTest {
         assertThat(arr1, is(not(sameInstance(arr2))));
 
         Person[] arr3 = generator.apply(20);
-        assertThat(arr1, arrayWithSize(20));
+        assertThat(arr3, arrayWithSize(20));
 
         Person[] people = employees.stream()
                                    .map(Employee::getPerson)
@@ -93,7 +92,7 @@ class StreamTest {
                                    .sorted()
                                    .map(String::valueOf)
                                    .filter(str -> str.length() < 4)
-                                   .collect(Collectors.toSet());
+                                   .collect(toSet());
         assertThat(result, containsInAnyOrder("10", "2", "4", "5"));
     }
 
@@ -107,9 +106,9 @@ class StreamTest {
     void name5() {
         Random random = new Random();
         boolean result = Stream.generate(() -> random.nextInt(100))
-                          .peek(System.out::println)
-                          .filter(value -> value > 49)
-                          .allMatch(value -> value < 90);
+                               .peek(System.out::println)
+                               .filter(value -> value > 49)
+                               .allMatch(value -> value < 90);
 
         assertThat(result, is(false));
 
@@ -117,6 +116,71 @@ class StreamTest {
 
     @Test
     void name6() {
+        Stream.iterate(1, value -> value + 2)
+              .skip(5)
+              .limit(5)
+              .forEach(System.out::println);
+
+        IntStream intStream = IntStream.range(4, 400);
+        IntSummaryStatistics statistics = intStream.summaryStatistics();
+        assertThat(statistics.getMax(), is(399));
+        assertThat(statistics.getMin(), is(4));
+        assertThat(statistics.getCount(), is(396L));
+    }
+
+    @Test
+    void name7() {
+        Optional<Person> empty = employees.stream()
+                                          .map(Employee::getPerson)
+                                          .filter(person -> person.getAge() < 0)
+                                          .max(Comparator.comparingInt(Person::getAge));
+
+        assertThat(empty.isPresent(), is(false));
+
+        Optional<Person> max = employees.stream()
+                                        .map(Employee::getPerson)
+                                        .max(Comparator.comparingInt(Person::getAge));
+
+        if (max.isPresent()) {
+            Person person = max.get();
+            String fullName = person.getFullName();
+            if (fullName.length() < 12) {
+                System.out.println(fullName);
+            }
+        }
+        max.map(Person::getFullName)
+           .filter(name -> name.length() < 12)
+           .ifPresent(System.out::println);
+    }
+
+    @Test
+    void name8() {
+        System.out.println(employees.stream()
+                                    //                .map(employee -> employee.getPerson().getFullName())
+                                    .map(Employee::getPerson)
+                                    .map(Person::getFullName)
+                                    .map(name -> "'" + name + "'")
+                                    .collect(joining(", ", "{", "}")));
+    }
+
+    @Test
+    void name9() {
+        Map<Person, List<JobHistoryEntry>> collect = employees.stream()
+                                                              .collect(toMap(Employee::getPerson, Employee::getJobHistory));
+        Map<String, Set<Person>> collect1 =
+                employees.stream()
+                         .collect(toMap(employee -> employee.getJobHistory().get(0).getEmployer(),
+                                        employee -> new HashSet<>(Collections.singleton(employee.getPerson())),
+                                        (set1, set2) -> {
+                                            set1.addAll(set2);
+                                            return set1;
+                                        }));
+        System.out.println(collect1);
+
+        Map<String, Set<Person>> collect2 =
+                employees.stream()
+                         .collect(groupingBy(employee -> employee.getJobHistory().get(0).getEmployer(),
+                                            mapping(Employee::getPerson, toSet())));
     }
 
     private static List<Employee> getEmployees() {

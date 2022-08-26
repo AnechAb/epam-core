@@ -34,12 +34,12 @@ class CollectionsTest {
 
     @Test
     void copyLists() {
-        List<String> src = Arrays.asList("1", "2", "3");
+        List<String> src = Arrays.asList("1", "3", "2");
         List<String> dst = Arrays.asList("2", "3", "1", "4");
 
         Collections.copy(dst, src);
 
-        assertEquals(Arrays.asList("1", "2", "3", "4"), dst);
+        assertEquals(Arrays.asList("1", "3", "2", "4"), dst);
     }
 
     @Test
