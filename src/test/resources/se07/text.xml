@@ -1,0 +1,16 @@
+<?xml version="1.1" encoding="UTF-8" standalone="yes"?>
+<!--test
+abcdef
+-->
+<root>
+    <level1 xmlns:my="myNamespace">
+        <my:level2></my:level2>
+        <level2></level2>
+        <my:level2></my:level2>
+    </level1>
+    <level1>
+<!--        <my:level2></my:level2> Exc-->
+        <level2></level2>
+        <level2></level2>
+    </level1>
+</root>
