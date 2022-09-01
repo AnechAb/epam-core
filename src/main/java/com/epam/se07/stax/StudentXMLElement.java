@@ -1,14 +1,15 @@
 package com.epam.se07.stax;
 
-public enum StudentElements {
+
+public enum StudentXMLElement {
     STUDENTS,
     STUDENT,
-    ADDRESS,
-    LOGIN,
     FACULTY,
+    LOGIN,
+    ADDRESS,
     STREET,
     CITY,
     COUNTRY,
-    TELEPHONE,
-    NAME
+    NAME,
+    TELEPHONE
 }
